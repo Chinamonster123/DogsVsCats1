@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     # val_dataset
     valset = CatDogDataset(val_files, val_dir, mode='test', transform=test_transform)
-    val_loader = DataLoader(valset, batch_size=32, shuffle=False, num_workers=4)
+    valloader = DataLoader(valset, batch_size=32, shuffle=False, num_workers=4)
 
     # test_dataset
     testset = CatDogDataset(test_files, test_dir, mode='test', transform=test_transform)
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
     def main():
         trainer = train.Trainer(criterion, optimizer, model)
-        trainer.loop(num_epochs, dataloader, val_loader)
-        trainer.accuracy(model, testloader, device)
+        trainer.loop(num_epochs, dataloader, valloader)
+        trainer.test(device, testloader)
 
     main()

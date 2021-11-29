@@ -2,10 +2,11 @@ import torch
 import os
 
 class Trainer:
-    def __init__(self, criterion, optimizer, model):
+    def __init__(self, criterion, optimizer, model, device):
         self.criterion = criterion
         self.optimizer = optimizer
         self.model = model
+        self.device = device
 
     def loop(self, num_epochs, train_loader, val_loader):
         for epoch in range(1, num_epochs + 1):
@@ -22,13 +23,32 @@ class Trainer:
         with torch.no_grad():
             self._iteration_val(dataloader, epoch, num_epochs)
 
+    def test(self, data_loader):
+        self.model.eval()
+        correct, total = 0, 0
+        for batch in data_loader:
+            images, labels = batch
+            images = images.to(self.device)
+            labels = labels.to(self.device)
+
+            outputs = self.model(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+            test_acc = correct / total
+
+            # print('Accuracy on the train set: %f %%' % (100 * train_acc))
+            print('Accuracy on the test set: %f %%' % (100 * test_acc))
+
+
     def _iteration_train(self, dataloader, epoch, num_epochs):
         total_step = len(dataloader)
         tot_loss = 0.0
         correct = 0
         for i, (images, labels) in enumerate(dataloader):
-            images = images.cuda()
-            labels = labels.cuda()
+            images = images.to(self.device)
+            labels = labels.to(self.device)
 
             # Forward pass
             outputs = self.model(images)
@@ -62,13 +82,13 @@ class Trainer:
                 os.makedirs(save_path)
             torch.save(self.model.state_dict(), save_path + "/" + "epoch" + str(epoch) + "-resnet121" + ".t7")
 
-    def _iteration_val(self, dataloader, epoch, num_epochs):
+    def _iteration_val(self, dataloader):
         total_step = len(dataloader)
         tot_loss = 0.0
         correct = 0
         for i, (images, labels) in enumerate(dataloader):
-            images = images.cuda()
-            labels = labels.cuda()
+            images = images.to(self.device)
+            labels = labels.to(self.device)
 
             # Forward pass
             outputs = self.model(images)
@@ -84,22 +104,3 @@ class Trainer:
         print('val loss: {:.4f}'.format(epoch_loss))
         epoch_acc = correct / len(dataloader.dataset)
         print('val acc: {:.4f}'.format(epoch_acc))
-
-    def accuracy(self, model, device, data_loader):
-        model.eval()
-        correct, total = 0, 0
-        for batch in data_loader:
-            images, labels = batch
-            images = images.to(device)
-            labels = labels.to(device)
-
-            outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
-
-          # train_acc = accuracy(model, trainloader)
-            test_acc = accuracy(model, testloader)
-
-            # print('Accuracy on the train set: %f %%' % (100 * train_acc))
-            print('Accuracy on the test set: %f %%' % (100 * test_acc))
