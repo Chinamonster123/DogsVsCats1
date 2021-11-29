@@ -1,6 +1,7 @@
 import torch
 import os
 
+
 class Trainer:
     def __init__(self, criterion, optimizer, model, device):
         self.criterion = criterion
@@ -21,7 +22,7 @@ class Trainer:
     def val(self, dataloader, epoch, num_epochs):
         self.model.eval()
         with torch.no_grad():
-            self._iteration_val(dataloader, epoch, num_epochs)
+            self._iteration_val(dataloader)
 
     def test(self, data_loader):
         self.model.eval()
@@ -40,7 +41,6 @@ class Trainer:
 
             # print('Accuracy on the train set: %f %%' % (100 * train_acc))
             print('Accuracy on the test set: %f %%' % (100 * test_acc))
-
 
     def _iteration_train(self, dataloader, epoch, num_epochs):
         total_step = len(dataloader)
