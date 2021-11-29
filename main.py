@@ -78,7 +78,7 @@ if __name__ == '__main__':
         nn.Linear(500, 2)
     )
 
-    model = model.to(device)
+    # model = model.to(device)
 
     ## train parameters
     criterion = nn.CrossEntropyLoss()
@@ -87,8 +87,8 @@ if __name__ == '__main__':
     num_epochs = 1
 
     def main():
-        trainer = train.Trainer(criterion, optimizer, model)
+        trainer = train.Trainer(criterion, optimizer, model, device)
         trainer.loop(num_epochs, dataloader, valloader)
-        trainer.test(device, testloader)
+        trainer.test(testloader)
 
     main()
