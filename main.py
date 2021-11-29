@@ -51,15 +51,15 @@ def main():
         normalize,
     ])
 
-    test_transform = transforms.Compose([
+    val_transform = transforms.Compose([
         transforms.Resize((128, 128)),
         transforms.ToTensor(),
         normalize,
     ])
 
-    train_dataset = CatDogDataset(dir=train_dir, is_test=False, transforms=train_transform)
-    val_dataset = CatDogDataset(dir=val_dir, is_test=False, transforms=test_transform)
-    # test_dataset = CatDogDataset(dir=test_dir, is_test=True, transforms=test_transform)
+    train_dataset = CatDogDataset(dir=train_dir, is_test=False, transform=train_transform)
+    val_dataset = CatDogDataset(dir=val_dir, is_test=False, transform=val_transform)
+    # test_dataset = CatDogDataset(dir=test_dir, is_test=True, transforms=val_transform)
 
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4)
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=4)
@@ -100,15 +100,14 @@ def train(train_loader, model, criterion, optimizer, epoch, device, print_freq=N
     data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
     top1 = AverageMeter('Acc@1', ':6.2f')
-    top5 = AverageMeter('Acc@5', ':6.2f')
+    # top5 = AverageMeter('Acc@5', ':6.2f')
     progress = ProgressMeter(
         len(train_loader),
-        [batch_time, data_time, losses, top1, top5],
+        [batch_time, data_time, losses, top1],
         prefix="Epoch: [{}]".format(epoch))
 
     # switch to train mode
     model.train()
-
     end = time.time()
     for i, (images, target) in enumerate(train_loader):
         # measure data loading time
